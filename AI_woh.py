@@ -290,12 +290,14 @@ scores = cross_val_score(tree, X, y, cv=10)
 print('Cross-Validation scores: {}'.format(scores))
 print('Average score: {}'.format(np.mean(scores)))
 """
-# graphviz
+
+"""
+# graphviz dotファイル生成
 from sklearn.tree import export_graphviz
 export_graphviz(tree, 
                 out_file='tree.dot', 
                 feature_names=['d1', 'd2'])
-
+"""
 
 
 """
