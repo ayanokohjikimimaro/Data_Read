@@ -17,6 +17,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.decomposition import PCA
 import pickle
+from IPython.display import Image
 
 def versiontuple(v):
     return tuple(map(int, (v.split("."))))
@@ -70,7 +71,7 @@ def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
 dirnow = os.path.abspath(".")
 datadir = "speech_commands_v0.01"
 filename_list = "file_name_list_0.txt"
-data_num = 500
+data_num = 50
 
 LABEL = ["one", "two", "tree"]
 print("Clasification:%s"%str(LABEL))
@@ -140,8 +141,8 @@ d3=107
 d4=42
 d5=41
 
-feature_sel = [d1, d2, d3, d4, d5]
-#feature_sel = [d1, d2]
+#feature_sel = [d1, d2, d3, d4, d5]
+feature_sel = [d1, d2]
 print("feature selected:%s"%(str(feature_sel)))
 X = M_list[:, feature_sel]#importance TOP5
 
@@ -220,6 +221,7 @@ plt.title('test_data')
 plt.show()
 # =============================================================================
 """
+
 """
 #PCA
 pca = PCA(n_components=2)
@@ -243,7 +245,8 @@ print('累積寄与率: {0}'.format(sum(pca.explained_variance_ratio_)))
 # グラフを表示する
 plt.show()
 """
-"""
+
+
 #Decisiontree　Classifier
 tree = DecisionTreeClassifier(criterion='entropy', max_depth=5, random_state=1)
 tree.fit(X_train, y_train)
@@ -264,7 +267,7 @@ plt.legend(loc='upper left')
 plt.tight_layout()
 # plt.savefig('./figures/decision_tree_decision.png', dpi=300)
 plt.show()
-"""
+
 
 
 """
@@ -280,11 +283,20 @@ print('Cross-Validation scores: {}'.format(scores))
 print('Average score: {}'.format(np.mean(scores)))
 """
 
+"""
 # 交差検証 Dicision Tree
 tree = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=1)
 scores = cross_val_score(tree, X, y, cv=10)
 print('Cross-Validation scores: {}'.format(scores))
 print('Average score: {}'.format(np.mean(scores)))
+"""
+# graphviz
+from sklearn.tree import export_graphviz
+export_graphviz(tree, 
+                out_file='tree.dot', 
+                feature_names=['d1', 'd2'])
+
+
 
 """
 # モデル保存/ロード
