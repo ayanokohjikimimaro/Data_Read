@@ -35,7 +35,7 @@ dirnow = os.path.abspath(".")
 datadir = "speech_commands_v0.01"
 #filename_list = "file_name_list_0.txt"
 
-data_num = 100
+data_num = 500
 print("data_num: %d"%(data_num))
 
 LABEL = ["on", "off", "up", "down", "yes", "no", "left", "right", "go", "stop"]
@@ -53,8 +53,9 @@ print("Feature Num: %d"%f_Num)
 n_comp = 3  # PCA
 print("PCA Num: %d"%n_comp)
 
-
+###################
 feature_ext = 1
+###################
 
 start = time.time()
 if feature_ext == 1:
@@ -94,9 +95,9 @@ if feature_ext == 1:
                     M_stati = sp.stats.skew(M, 1).reshape(1, len(M))
                 elif kkk == 5:  # kur
                     M_stati = sp.stats.kurtosis(M, 1).reshape(1, len(M))
-                elif kkk == 6:  # kur
+                elif kkk == 6:  
                     M_stati = ( np.max(M, 1)-np.min(M, 1) ).reshape(1, len(M))
-                elif kkk == 7:  # kur
+                elif kkk == 7:  
                     M_stati = ( np.max(M, 1) / np.min(M, 1) ).reshape(1, len(M))
                     
                 M_h[n*3*kkk : n*3*kkk+n*3] = M_stati
@@ -276,6 +277,7 @@ k_feat_att = 60
 scores_lis = np.zeros([random_n, f_Num - k_feat_min + 1])
 subset_lis = np.zeros([random_n, k_feat_att])
 
+# SBS
 for random_state_ in range(random_n):
     sbs = SBS(knn, k_features=k_feat_min, random_state=random_state_)
     sbs.fit(X_train_std, y_train)
@@ -284,21 +286,40 @@ for random_state_ in range(random_n):
 
 scores_lis_mean = np.mean(scores_lis,0)
 
+#list marge
 subset_mrg=[]
 for jjj in range(len(subset_lis)):
     list1 = list(subset_lis[jjj])
     subset_mrg.extend(list1)
     subset_mrg=list(set(subset_mrg))
-#list marge
+
+subset_cnt_list=[]
+
+for kkk in range(len(subset_mrg)):
+    subset_cnt=0
     
+    for iii in range(30):
+        for jjj in range(60):
+            if subset_lis[iii][jjj] == subset_mrg[kkk]:
+                subset_cnt = subset_cnt + 1
+            else:
+                pass
+                
+    subset_cnt_list.append(subset_cnt)
+subset_cnt_ =np.vstack([subset_mrg, subset_cnt_list])
+
+
 # plotting performance of feature subsets
 k_feat = [len(k) for k in sbs.subsets_]
-plt.plot(k_feat, scores_lis_mean, marker='o')
+plt.figure(1),plt.plot(k_feat, scores_lis_mean, marker='o')
 plt.ylabel('Accuracy')
 plt.xlabel('Number of features')
 plt.grid()
 plt.tight_layout()
 # plt.savefig('images/04_08.png', dpi=300)
+
+plt.figure(2),plt.bar(subset_cnt_[0],subset_cnt_[1])
+
 plt.show()
 
 elapsed_time2 = time.time() - start2
