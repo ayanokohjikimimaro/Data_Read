@@ -324,3 +324,40 @@ plt.show()
 
 elapsed_time2 = time.time() - start2
 print ("elapsed_time:{0}".format(elapsed_time2) + "[sec]")
+
+df=pd.DataFrame(subset_cnt_list, index=subset_mrg.round().astype(int))
+df = df.sort_values(by=0,ascending=False)
+
+#df.index ->
+# [20,34,,7,17,14,11,19,30,0,53,5,68,10,60,66,65,29,44,49,59,32,54,1,42,12,7,43,4,25,36,28,84,6,16,48,15,2,75,76,63,80,39,3,31,21,46,79,91,50,78,88,26,22,45,35,37,24,9,13,96,73,93,77,99,41,8,61,67,71,83,47,51,81,62,23,56,94,52,33,82,97,18,70,40,74,72,85,27,69,86,98,58,38,95,55,64,89,87,90]
+
+f_best = list(df.index)[0:60]
+
+f_best_ = []
+for iii in f_best:
+    f_best_.append(round(iii))
+
+X_ = X[:,f_best_]
+
+
+test_prop = 0.3
+random_seed = 1
+
+X_train, X_test, y_train, y_test = train_test_split(X_, y, test_size=test_prop, random_state=random_seed)
+sc = StandardScaler()
+sc.fit(X_train)
+X_train_std = sc.transform(X_train)
+X_test_std = sc.transform(X_test)
+
+for max_depth in [5]:    
+    #print("n_components = %d"%(n_comp))
+    print("max_depth = %d"%(max_depth))    
+    
+    # Decisiontree　Classifier
+    tree = []
+    tree = DecisionTreeClassifier(criterion='entropy', max_depth=max_depth, random_state=1)
+    tree.fit(X_train_std, y_train)
+    
+    y_test_pred = tree.predict(X_test_std)
+    accuracy = metrics.accuracy_score(y_test, y_test_pred)
+    print("accuracy by tree : {}".format(accuracy))
