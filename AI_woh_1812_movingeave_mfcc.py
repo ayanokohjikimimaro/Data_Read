@@ -90,7 +90,7 @@ dirnow = os.path.abspath(".")
 datadir = "speech_commands_v0.01"
 #filename_list = "file_name_list_0.txt"
 
-data_num = 100
+data_num = 20
 print("data_num: %d"%(data_num))
 
 LABEL = ["on", "off", "up", "down", "yes", "no", "left", "right", "go", "stop"]
@@ -109,9 +109,9 @@ n_comp = 3  # PCA
 print("PCA Num: %d"%n_comp)
 
 ###################
-feature_ext = 0
-K_nn_rnd = 1
-sbs_knn = 0
+feature_ext = 1
+K_nn_rnd = 0
+sbs_knn = 1
 ###################
 k_n_ = 30
 num_ = np.arange(1,12,1)
@@ -283,18 +283,36 @@ for n in mfcc_n :
         knn = KNeighborsClassifier(n_neighbors=25)
         
         # selecting features
-        random_n = 10
+        random_n = 5
         k_feat_min = 1
         k_feat_att = 60
         scores_lis = np.zeros([random_n, f_Num - k_feat_min + 1])
         subset_lis = np.zeros([random_n, k_feat_att])
         
         # SBS
+        f_n = "sbs_knn_selcted_feat_mfcc%d_movingave%d.csv"%(n,num)
+        
+        fp = open(f_n,'w')
+        fp.close()
+        
+        
         for random_state_ in range(random_n):
             sbs = SBS(knn, k_features=k_feat_min, random_state=random_state_)
             sbs.fit(X_train_std, y_train)
             scores_lis[random_state_,:] = np.array(sbs.scores_).reshape(1, len(sbs.scores_))
             subset_lis[random_state_,:] = np.array(list(sbs.subsets_[ f_Num - k_feat_att ]))
+            
+            # added for loop
+            sbs_sel_list = []
+
+            for iii in range(len(sbs.subsets_[0]) - k_feat_min + 1):
+                
+                datastring = ','.join( [ str(x)for x in sbs.subsets_[iii] ] )
+                
+                fp = open(f_n, 'a')
+                fp.write(datastring + '\n')
+                fp.close()
+            
         
         scores_lis_mean = np.mean(scores_lis,0)
         
